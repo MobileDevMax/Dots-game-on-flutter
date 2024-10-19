@@ -1,0 +1,95 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(DotsGame());
+}
+
+class DotsGame extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Dots Game',
+      home: GameBoard(),
+    );
+  }
+}
+
+class GameBoard extends StatefulWidget {
+  @override
+  _GameBoardState createState() => _GameBoardState();
+}
+
+class _GameBoardState extends State<GameBoard> {
+  final int gridSize = 6; 
+  late List<List<int>> board;
+
+  int currentPlayer = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    board = List.generate(gridSize, (_) => List.filled(gridSize, 0));
+  }
+
+  void _addDot(int x, int y) {
+    if (board[x][y] == 0) {
+      setState(() {
+        board[x][y] = currentPlayer;
+        currentPlayer = (currentPlayer == 1) ? 2 : 1; 
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Dots Game")),
+      body: Center(
+        child: Column(
+          children: [
+            Expanded(child: _buildGrid()),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text("Player $currentPlayer, put a dot!"),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGrid() {
+    return GridView.builder(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: gridSize),
+      itemCount: gridSize * gridSize,
+      itemBuilder: (context, index) {
+        int x = index ~/ gridSize;
+        int y = index % gridSize;
+
+        return GestureDetector(
+          onTap: () => _addDot(x, y),
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(),
+              color: _getColor(board[x][y]),
+            ),
+            child: Center(
+              child: Text(board[x][y] != 0 ? '●' : ''),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Color _getColor(int player) {
+    switch (player) {
+      case 1:
+        return Colors.blue;
+      case 2:
+        return Colors.red;
+      default:
+        return Colors.white;
+    }
+  }
+}
